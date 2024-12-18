@@ -1,0 +1,43 @@
+from netmiko import ConnectHandler
+
+
+device = {
+    'device_type': 'cisco_ios',
+    'host': '192.168.56.103',
+    'username': 'cisco',
+    'password': 'cisco123!',
+}
+
+def configure_router(connection):
+    """
+    Configures a loopback interface, another interface, and sets up EIGRP.
+    """
+    config_commands = [
+
+        
+        "interface loopback0",
+        "ip address 10.1.1.1 255.255.255.255",
+        "no shutdown",
+                 
+        "interface loopback1",
+        "ip address 10.1.1.2 255.255.255.255",
+        "no shutdown",
+                
+        "router eigrp 100",
+        "network 10.1.1.1 0.0.0.0",
+        "network 192.168.1.0 0.0.0.255",
+        "no auto-summary",
+        
+    ]
+    print("\nConfiguring router...")
+    output = connection.send_config_set(config_commands)
+    print(output)
+
+if __name__ == "__main__":
+   
+    connection = ConnectHandler(**device)
+    try:
+        configure_router(connection)
+    finally:
+        connection.disconnect()
+    print("Configuration completed.")
